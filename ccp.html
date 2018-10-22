@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../../../favicon.ico">
+
+    <title>Demo site for API security</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="bootstrap-table.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="jumbotron.css" rel="stylesheet">
+  </head>
+
+  <body onload='callRest()'>
+
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="jumbotron">
+      <div class="container">
+          <p>
+            <a href="index.html" class="btn btn-info btn-lg">
+              <span class="glyphicon glyphicon-home"></span> Home
+            </a>
+          </p> 
+        <h1 class="display-3">Commitment core product</h1>
+        <p>This demo website demonstrates using JWT tokens for securing rest/api calls. The tokens are issued by Azure AD or USI</p>
+        <p>Welcome user: </p>
+        <p id="userdetails"> </p>
+     <!--  <p><a class="btn btn-primary btn-lg" href="javascript:callRest()" role="button">Display Tokens&raquo;</a></p> -->
+      </div>
+    </div>
+
+    <div class="container">
+      <!-- Example row of columns -->
+      <div class="row">
+        <div class="col-md-6">
+          <h2>Booking</h2>
+            <table id="booking">
+                <thead>
+                <tr>
+                    <th data-field="key"></th>
+                    <th data-field="value"></th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+        <div class="col-md-6">
+          <h2>Bill of Lading</h2>
+            <table id="bol">
+                <thead>
+                <tr>
+                    <th data-field="key"></th>
+                    <th data-field="value"></th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <h2>Finance</h2>
+            <table id="finance">
+                <thead>
+                <tr>
+                    <th data-field="key"></th>
+                    <th data-field="value"></th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+        <div class="col-md-6">
+          <h2>Admin</h2>
+            <table id="admin">
+                <thead>
+                <tr>
+                    <th data-field="key"></th>
+                    <th data-field="value"></th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+      </div>
+
+
+
+      <footer>
+        <p>&copy; Company 2017</p>
+      </footer>
+    </div> <!-- /container -->
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script>window.jQuery || document.write('<script src="assets/js/vendor/jquery.min.js"><\/script>')</script>
+    <script src="assets/js/vendor/popper.min.js"></script>
+    <script src="dist/js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="assets/js/ie10-viewport-bug-workaround.js"></script>
+    <script src="callrest.js"></script>
+    <script src="bootstrap-table.js"> </script>
+  </body>
+</html>

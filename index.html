@@ -1,0 +1,39 @@
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../../../favicon.ico">
+
+    <title>FR Status</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="jumbotron.css" rel="stylesheet">
+    <script type="text/javascript" src="callrest.js"></script>
+  </head>
+
+  <body>
+
+    <div class="jumbotron">
+      <div class="container">
+        <h1 class="display-3">FR Status</h1>
+	 
+  <div class="form-group">
+    <label for="username">Username</label>
+    <input type="username" class="form-control" id="uname" aria-describedby="usernameHelp" placeholder="Enter username">
+    <small id="emailHelp" class="form-text text-muted">Provide your username here</small>
+  </div>
+  <div class="form-group">
+    <label for="password">Password</label>
+    <input type="password" class="form-control" id="pwd" placeholder="Password">
+  </div>
+    <a href='#' onclick=callRest() class="btn btn-info" role="button">Login and Get data</a>
+<label id='users'></label>
+<label id='profiles'></label>
+<label id='entitlements'></label>
+  </body>
+</html>
