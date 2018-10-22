@@ -19,7 +19,8 @@ function callApi(element, url)
     apiXMLReq.onreadystatechange = function() {
         if (this.readyState == 4)
         {
-		document.getElementById(element).innerHTML = this.responseText;
+	    result= JSON.parse(this.responseText).totalPagedResults;
+		document.getElementById(element).innerHTML = result;
         }
       };
     apiXMLReq.open("GET", api_url + url , true );
