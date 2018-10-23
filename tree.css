@@ -1,0 +1,17 @@
+div.tree {
+    border: .05px solid black;
+    position: relative;
+    width:80%;
+    left: 40px;
+}
+div.clear {
+    clear: both;
+}
+div.leaf{
+    background-color: #aabbcc
+}
+
+div.parent{
+    background-color: #5599fa
+}
+    
