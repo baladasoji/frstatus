@@ -1,8 +1,9 @@
 div.tree {
-    border: .05px solid black;
+/*    border: .05px solid black;*/
     position: relative;
-    width:80%;
-    left: 40px;
+    width:75%;
+    left: 15px;
+    font-size: x-small;
 }
 div.clear {
     clear: both;

@@ -4,7 +4,9 @@ var bolXMLReq;
 var finXMLReq;
 var admXMLReq;
 var api_url = "https://api280801live.gateway.akana.com/";
+//var api_url = "https://iam.maerskline.com/";
 var unamehdr = "X-OpenIDM-Username";
+var datacenterhdr = "X-TEST-FAILOVER";
 var uname;
 var pwd;
 var pwdhdr = "X-OpenIDM-Password";
@@ -12,9 +14,11 @@ var userURI = "openidm/managed/user?_queryId=query-all-ids&_pageSize=3&_totalPag
 var profileURI = "openidm/managed/UserProfile?_queryId=query-all-ids&_pageSize=3&_totalPagedResultsPolicy=EXACT";
 var entitlementsURI = "openidm/managed/entitlement?_queryId=query-all-ids&_pageSize=3&_totalPagedResultsPolicy=EXACT";
 var searchuserURI = "openidm/managed/user?_queryFilter=userName+eq+%22";
-var singleUser;
-var singleProfile;
-var singleEntitlement;
+var DC = 'dd2b96f8cc6b45f59f8aed9979b4a0f3';
+var waittime=1000;
+//var singleUser;
+//var singleProfile;
+//var singleEntitlement;
 
 function callApi(element, url)
 {
@@ -51,7 +55,15 @@ function searchUser()
 	uname=document.getElementById('uname').value.trim();
 	pwd=document.getElementById('pwd').value.trim();
 	suser=document.getElementById('suser').value.trim();
-        callUserApi('userresult',searchuserURI+ suser + '%22' );
+	waittime = parseInt(document.getElementById('waittime').value.trim());
+	waittime = waittime*1000;
+//        callUserApi('userresult',searchuserURI+ suser + '%22' );
+	DC='dd2b96f8cc6b45f59f8aed9979b4a0f3';
+        callUserApi('emeauserresult',searchuserURI+ suser + '%22',DC );
+	DC='65fae118dfb94b76ac11d7dc00d761c0';
+        callUserApi('apacuserresult',searchuserURI+ suser + '%22',DC );
+	DC='4f11b641441c450eb1655f318e408ae5';
+        callUserApi('ameruserresult',searchuserURI+ suser + '%22',DC );
 }
 function callRest()
 {
@@ -69,7 +81,7 @@ function callRest()
         callApi('entitlements',entitlementsURI);
         callUserApi('userresult',searchuserURI+ suser + '%22' );
 }
-function callProfileApi(element, url)
+function callProfileApi(element, url,datacenter)
 {
     var apiXMLReq = new XMLHttpRequest();
     apiXMLReq.onreadystatechange = function() {
@@ -78,23 +90,25 @@ function callProfileApi(element, url)
 	    var singleProfile;
 	    profileresult= JSON.parse(this.responseText);
 	    profilename = profileresult.userProfileKey;
-	    singleProfile = { "profilename": profilename, "entitlements":[]};
+	    var singleProfile = { "profilename": profilename, "entitlements":[]};
 	    entitlements = profileresult.entitlements;
 	    for ( e in entitlements )
 	    {
-		    callEntitlementApi (singleProfile , 'openidm/' + entitlements[e]._ref );
+		    callEntitlementApi (singleProfile , 'openidm/' + entitlements[e]._ref, datacenter );
 	    }
+	    singleProfile.entitlements.sort();
 	    element.profiles.push(singleProfile);
         }
       };
     apiXMLReq.open("GET", api_url + url , true );
     apiXMLReq.setRequestHeader(unamehdr, uname );
     apiXMLReq.setRequestHeader(pwdhdr, pwd );
+    apiXMLReq.setRequestHeader(datacenterhdr, datacenter );
     apiXMLReq.send(null);
 
 }
 
-function callEntitlementApi(element, url)
+function callEntitlementApi(element, url, datacenter)
 {
     var apiXMLReq = new XMLHttpRequest();
     apiXMLReq.onreadystatechange = function() {
@@ -108,11 +122,12 @@ function callEntitlementApi(element, url)
     apiXMLReq.open("GET", api_url + url , true );
     apiXMLReq.setRequestHeader(unamehdr, uname );
     apiXMLReq.setRequestHeader(pwdhdr, pwd );
+    apiXMLReq.setRequestHeader(datacenterhdr, datacenter );
     apiXMLReq.send(null);
 }
 
 
-function callUserApi(element, url)
+function callUserApi(element, url, datacenter)
 {
     var apiXMLReq = new XMLHttpRequest();
 
@@ -124,13 +139,14 @@ function callUserApi(element, url)
 	    if (userresult.result.length != 0)
 	    {
 		username = userresult.result[0].userName;
-		singleUser = { "username" : username , "profiles" : []};
+		var singleUser = { "username" : username , "profiles" : []};
 		profiles = userresult.result[0].userProfiles;
 		for (profile in profiles)
 		{
-		    callProfileApi (singleUser , 'openidm/' + profiles[profile]._ref );
+		    callProfileApi (singleUser , 'openidm/' + profiles[profile]._ref, datacenter );
 		}
-		await new Promise(resolve => setTimeout(resolve, 8000));
+		await new Promise(resolve => setTimeout(resolve, waittime));
+		singleUser.profiles.sort();
 		document.getElementById(element).innerHTML = renderJSON(singleUser);
 	    }
 	    else
@@ -142,6 +158,7 @@ function callUserApi(element, url)
     apiXMLReq.open("GET", api_url + url , true );
     apiXMLReq.setRequestHeader(unamehdr, uname );
     apiXMLReq.setRequestHeader(pwdhdr, pwd );
+    apiXMLReq.setRequestHeader(datacenterhdr, datacenter );
     apiXMLReq.send(null);
 }
 

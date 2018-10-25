@@ -39,6 +39,10 @@
 	    <label for="suser">User to Search</label>
 	    <input type="username" class="form-control" id="suser" placeholder="UserSearch">
 	  </div>
+	  <div class="form-group">
+	    <label for="waittime">Timeout (seconds)</label>
+	    <input type="text" class="form-control" id="waittime" placeholder="Wait time" value="10">
+	  </div>
 	<a href='#tab-counter' onclick=getCounts() class="btn btn-info" role="button">Get ManagedObject count</a>
 	<a href='#tab-search' onclick=searchUser() class="btn btn-info" role="button">Search for User</a>
     <BR>
@@ -75,6 +79,22 @@
 	<div id="tab-search" style="display:none">
 	    <h3>Search Result</h3>
 	    <div id='userresult'></div>
+	  <table class="table table-striped table-bordered">
+	    <thead>
+	      <tr>
+		<th>EMEA</th>
+		<th>APAC</th>
+		<th>AMER</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr>
+		<td id='emeauserresult'></td>
+		<td id='apacuserresult'></td>
+		<td id='ameruserresult'></td>
+	      </tr>
+	    </tbody>
+	  </table>
 	</div>
   </body>
 </html>
