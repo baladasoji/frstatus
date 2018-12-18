@@ -1,9 +1,24 @@
-var jwtb = false;
-var bkgXMLReq;
-var bolXMLReq;
-var finXMLReq;
-var admXMLReq;
-var api_url = "https://api280801live.gateway.akana.com/";
+
+var currentEnv="";
+var api_url_live = "https://api280801live.gateway.akana.com/";
+var api_url_stage = "https://api301002live.gateway.akana.com/";
+var api_url_cdt = "https://api301002sandbox.gateway.akana.com/";
+
+var cdt_emea="d6e1949593824ca4b74dcc5b3dd3aa02";
+var cdt_amer="";
+var cdt_apac="2268de00eaea4378b2975f149f41d00f";
+var pp_emea="f0c2af13a6754bf3806e978e6286fc75";
+var pp_apac="c7637f83993b489d98d8bb914c3607af";
+var pp_amer="19a96ae12e7248408e95feb1f71a51a5";
+var p_emea="dd2b96f8cc6b45f59f8aed9979b4a0f3";
+var p_apac="65fae118dfb94b76ac11d7dc00d761c0";
+var p_amer="4f11b641441c450eb1655f318e408ae5";
+var EMEA_DC="";
+var AMER_DC="";
+var APAC_DC="";
+var countsOnly=true;
+
+var api_url = api_url_cdt ;
 //var api_url = "https://iam.maerskline.com/";
 var unamehdr = "X-OpenIDM-Username";
 var datacenterhdr = "X-TEST-FAILOVER";
@@ -20,67 +35,48 @@ var waittime=1000;
 //var singleProfile;
 //var singleEntitlement;
 
-function callApi(element, url)
-{
-    var apiXMLReq = new XMLHttpRequest();
-    apiXMLReq.onreadystatechange = function() {
-        if (this.readyState == 4)
-        {
-	    result= JSON.parse(this.responseText).totalPagedResults;
-		document.getElementById(element).innerHTML = result;
-        }
-      };
-    apiXMLReq.open("GET", api_url + url , true );
-    apiXMLReq.setRequestHeader(unamehdr, uname );
-    apiXMLReq.setRequestHeader(pwdhdr, pwd );
-    //alert ("Sending" + uname + "  " + pwd);
-    apiXMLReq.send(null);
 
-}
-
-function getCounts()
-{
-	document.getElementById("tab-search").style.display='none';
-	document.getElementById("tab-counter").style.display='block';
-	uname=document.getElementById('uname').value.trim();
-	pwd=document.getElementById('pwd').value.trim();
-        callApi('users',userURI);
-        callApi('profiles',profileURI);
-        callApi('entitlements',entitlementsURI);
-}
 function searchUser()
 {
-	document.getElementById("tab-search").style.display='block';
-	document.getElementById("tab-counter").style.display='none';
-	uname=document.getElementById('uname').value.trim();
-	pwd=document.getElementById('pwd').value.trim();
-	suser=document.getElementById('suser').value.trim();
-	waittime = parseInt(document.getElementById('waittime').value.trim());
-	waittime = waittime*1000;
-//        callUserApi('userresult',searchuserURI+ suser + '%22' );
-	DC='dd2b96f8cc6b45f59f8aed9979b4a0f3';
-        callUserApi('emeauserresult',searchuserURI+ suser + '%22',DC );
-	DC='65fae118dfb94b76ac11d7dc00d761c0';
-        callUserApi('apacuserresult',searchuserURI+ suser + '%22',DC );
-	DC='4f11b641441c450eb1655f318e408ae5';
-        callUserApi('ameruserresult',searchuserURI+ suser + '%22',DC );
+  if (currentEnv == null || currentEnv == "" || currentEnv == "NONE" )
+  {
+    showMsgNSecs ('alert-danger','Please choose environment first',3);
+  }
+  else
+  {
+
+/*
+    allusersstr=  document.getElementById('allusers').value;
+    users = allusersstr.split("\n");
+    for (i=0; i<users.length; i++)
+    {
+      curuser = users[i];
+      if (curuser.trim() != "")
+      {
+        //console.log(emails[email]);
+	callUserApi('emeauserresult',searchuserURI+ curuser + '%22',EMEA_DC );
+      }
+    }
+*/
+    document.getElementById("tab-search").style.display='block';
+    uname=document.getElementById('uname').value.trim();
+    pwd=document.getElementById('pwd').value.trim();
+    suser=document.getElementById('suser').value.trim();
+    waittime = parseInt(document.getElementById('waittime').value.trim());
+    waittime = waittime*1000;
+    countsOnly=document.getElementById("checkCountOnly").checked;
+    callUserApi('emeauserresult',searchuserURI+ suser + '%22',EMEA_DC );
+    callUserApi('apacuserresult',searchuserURI+ suser + '%22',APAC_DC );
+    callUserApi('ameruserresult',searchuserURI+ suser + '%22',AMER_DC );
+  }
 }
+
 function callRest()
 {
-	ures = '';
-	pres = '';
-	eres = '';
-	document.getElementById('userresult').innerHTML = ures;
-	document.getElementById('profileresult').innerHTML = pres;
-	document.getElementById('entitlementresult').innerHTML = eres;
-	uname=document.getElementById('uname').value.trim();
-	pwd=document.getElementById('pwd').value.trim();
-	suser=document.getElementById('suser').value.trim();
-        callApi('users',userURI);
-        callApi('profiles',profileURI);
-        callApi('entitlements',entitlementsURI);
-        callUserApi('userresult',searchuserURI+ suser + '%22' );
+	document.getElementById('environmentChoice').addEventListener('click', changeEnvironment);
+	document.getElementById('btnSearchUser').addEventListener('click', searchUser);
 }
+
 function callProfileApi(element, url,datacenter)
 {
     var apiXMLReq = new XMLHttpRequest();
@@ -90,14 +86,26 @@ function callProfileApi(element, url,datacenter)
 	    var singleProfile;
 	    profileresult= JSON.parse(this.responseText);
 	    profilename = profileresult.userProfileKey;
-	    var singleProfile = { "profilename": profilename, "entitlements":[]};
-	    entitlements = profileresult.entitlements;
-	    for ( e in entitlements )
+	    var singleProfile;
+	    if (countsOnly)
 	    {
-		    callEntitlementApi (singleProfile , 'openidm/' + entitlements[e]._ref, datacenter );
+		singleProfile = { "profilename": profilename, "entitlements":0};
+		entitlements = profileresult.entitlements;
+		singleProfile.entitlements=entitlements.length;
+		element.profiles.push(singleProfile);
 	    }
-	    singleProfile.entitlements.sort();
-	    element.profiles.push(singleProfile);
+	    else
+	    {
+		singleProfile = { "profilename": profilename, "entitlements":[]};
+		entitlements = profileresult.entitlements;
+		for ( e in entitlements )
+		{
+		    callEntitlementApi (singleProfile , 'openidm/' + entitlements[e]._ref, datacenter );
+		}
+		singleProfile.entitlements=singleProfile.entitlements.sort((a, b) => a < b ? -1 : 1);
+	//	console.log(singleProfile.entitlements);
+		element.profiles.push(singleProfile);
+	    }
         }
       };
     apiXMLReq.open("GET", api_url + url , true );
@@ -146,7 +154,7 @@ function callUserApi(element, url, datacenter)
 		    callProfileApi (singleUser , 'openidm/' + profiles[profile]._ref, datacenter );
 		}
 		await new Promise(resolve => setTimeout(resolve, waittime));
-		singleUser.profiles.sort();
+		singleUser.profiles=singleUser.profiles.sort((a, b) => a.profilename < b.profilename ? -1 : 1);
 		document.getElementById(element).innerHTML = renderJSON(singleUser);
 	    }
 	    else
@@ -179,3 +187,48 @@ function renderJSON(obj) {
     }
     return retValue;
 }
+
+function changeEnvironment()
+{
+  currentEnv = this.value;
+  //console.log("Current environment is "+currentEnv);
+  if (currentEnv === "NONE")
+  {
+    return;
+  }
+  else if (currentEnv === "CDT")
+  {
+    api_url=api_url_cdt;
+    EMEA_DC=cdt_emea;
+    APAC_DC=cdt_apac;
+    AMER_DC=cdt_amer;
+  }
+  else if (currentEnv === "STAGE")
+  {
+    api_url=api_url_stage;
+    EMEA_DC=pp_emea;
+    APAC_DC=pp_apac;
+    AMER_DC=pp_amer;
+  }
+  else if (currentEnv == "PRODUCTION")
+  {
+    api_url=api_url_live;
+    EMEA_DC=p_emea;
+    APAC_DC=p_apac;
+    AMER_DC=p_amer;
+  }
+
+}
+
+
+ function showMsgNSecs (alertclass, message, numsecs)
+  {
+    document.getElementById('message').className = "alert "+alertclass;
+    document.getElementById('message').innerHTML = message;
+    document.getElementById('message').style = 'visibility:visible';
+
+    setTimeout(function(){
+      document.getElementById('message').style = 'visibility:hidden';
+    }, numsecs*1000);
+  }
+
