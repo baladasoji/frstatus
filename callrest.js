@@ -1,4 +1,3 @@
-
 var currentEnv="";
 var api_url_live = "https://api280801live.gateway.akana.com/";
 var api_url_stage = "https://api301002live.gateway.akana.com/";
@@ -17,6 +16,7 @@ var EMEA_DC="";
 var AMER_DC="";
 var APAC_DC="";
 var countsOnly=true;
+var latestentitlements;
 
 var api_url = api_url_cdt ;
 //var api_url = "https://iam.maerskline.com/";
@@ -28,7 +28,7 @@ var pwdhdr = "X-OpenIDM-Password";
 var userURI = "openidm/managed/user?_queryId=query-all-ids&_pageSize=3&_totalPagedResultsPolicy=EXACT";
 var profileURI = "openidm/managed/UserProfile?_queryId=query-all-ids&_pageSize=3&_totalPagedResultsPolicy=EXACT";
 var entitlementsURI = "openidm/managed/entitlement?_queryId=query-all-ids&_pageSize=3&_totalPagedResultsPolicy=EXACT";
-var searchuserURI = "openidm/managed/user?_queryFilter=userName+eq+%22";
+var searchuserURI = "openidm/managed/user?_queryFilter=userName+eq+";
 var DC = 'dd2b96f8cc6b45f59f8aed9979b4a0f3';
 var waittime=1000;
 //var singleUser;
@@ -38,36 +38,40 @@ var waittime=1000;
 
 function searchUser()
 {
+  document.getElementById('emeauserresult').innerHTML = '' ;
+  document.getElementById('apacuserresult').innerHTML = '' ;
+  document.getElementById('ameruserresult').innerHTML = '' ;
   if (currentEnv == null || currentEnv == "" || currentEnv == "NONE" )
   {
     showMsgNSecs ('alert-danger','Please choose environment first',3);
   }
   else
   {
-
-/*
-    allusersstr=  document.getElementById('allusers').value;
-    users = allusersstr.split("\n");
-    for (i=0; i<users.length; i++)
-    {
-      curuser = users[i];
-      if (curuser.trim() != "")
-      {
-        //console.log(emails[email]);
-	callUserApi('emeauserresult',searchuserURI+ curuser + '%22',EMEA_DC );
-      }
-    }
-*/
     document.getElementById("tab-search").style.display='block';
     uname=document.getElementById('uname').value.trim();
     pwd=document.getElementById('pwd').value.trim();
-    suser=document.getElementById('suser').value.trim();
     waittime = parseInt(document.getElementById('waittime').value.trim());
+    showMsgNSecs ('alert-info' ,'<span class="fas fa-spinner"></span> Searching for users please wait...',waittime+2);
     waittime = waittime*1000;
     countsOnly=document.getElementById("checkCountOnly").checked;
-    callUserApi('emeauserresult',searchuserURI+ suser + '%22',EMEA_DC );
-    callUserApi('apacuserresult',searchuserURI+ suser + '%22',APAC_DC );
-    callUserApi('ameruserresult',searchuserURI+ suser + '%22',AMER_DC );
+    singleDCOnly=document.getElementById("checkSingleDC").checked;
+
+    allusersstr=document.getElementById('usernames').value;
+    users = allusersstr.split("\n");
+    for (i=0; i<users.length; i++)
+    {
+      suser = users[i];
+      if (suser.trim() != "")
+      {
+        //console.log(emails[email]);
+	callUserApi('emeauserresult',searchuserURI, suser  ,EMEA_DC );
+	if (!singleDCOnly)
+	{
+	    callUserApi('apacuserresult',searchuserURI, suser ,APAC_DC );
+	    callUserApi('ameruserresult',searchuserURI, suser ,AMER_DC );
+	}
+      }
+    }
   }
 }
 
@@ -83,28 +87,34 @@ function callProfileApi(element, url,datacenter)
     apiXMLReq.onreadystatechange = function() {
         if (this.readyState == 4)
         {
-	    var singleProfile;
-	    profileresult= JSON.parse(this.responseText);
-	    profilename = profileresult.userProfileKey;
-	    var singleProfile;
-	    if (countsOnly)
+	    if (this.status == 200)
 	    {
-		singleProfile = { "profilename": profilename, "entitlements":0};
-		entitlements = profileresult.entitlements;
-		singleProfile.entitlements=entitlements.length;
-		element.profiles.push(singleProfile);
-	    }
-	    else
-	    {
-		singleProfile = { "profilename": profilename, "entitlements":[]};
-		entitlements = profileresult.entitlements;
-		for ( e in entitlements )
+		var singleProfile;
+		profileresult= JSON.parse(this.responseText);
+		profilename = profileresult.userProfileKey;
+		var singleProfile;
+		if (countsOnly)
 		{
-		    callEntitlementApi (singleProfile , 'openidm/' + entitlements[e]._ref, datacenter );
+		    singleProfile = { "profilename": profilename, "entitlements":0};
+		    entitlements = profileresult.entitlements;
+		    singleProfile.entitlements=entitlements.length;
+		    element.profiles.push(singleProfile);
 		}
-		singleProfile.entitlements=singleProfile.entitlements.sort((a, b) => a < b ? -1 : 1);
-	//	console.log(singleProfile.entitlements);
-		element.profiles.push(singleProfile);
+		else
+		{
+		    singleProfile = { "profilename": profilename, "entitlements":[]};
+		    entitlements = profileresult.entitlements;
+		    for ( e in entitlements )
+		    {
+			callEntitlementApi (singleProfile , 'openidm/' + entitlements[e]._ref, datacenter );
+		    }
+	    //	console.log(singleProfile.entitlements);
+		    element.profiles.push(singleProfile);
+		}
+	    }
+	    else if (this.status == 401)
+	    {
+		showMsgNSecs ('alert-danger',JSON.parse(this.responseText).message + " - Please check your credentials",3);
 	    }
         }
       };
@@ -122,9 +132,16 @@ function callEntitlementApi(element, url, datacenter)
     apiXMLReq.onreadystatechange = function() {
         if (this.readyState == 4)
         {
-	    entitlementresult= JSON.parse(this.responseText);
-	    entitlementname = entitlementresult.entitlementKey;
-	    element.entitlements.push(entitlementname);
+	    if (this.status == 200)
+	    {
+		entitlementresult= JSON.parse(this.responseText);
+		entitlementname = entitlementresult.entitlementKey;
+		element.entitlements.push(entitlementname);
+	    }
+	    else if (this.status == 401)
+	    {
+		showMsgNSecs ('alert-danger',JSON.parse(this.responseText).message + " - Please check your credentials",3);
+	    }
         }
       };
     apiXMLReq.open("GET", api_url + url , true );
@@ -135,31 +152,48 @@ function callEntitlementApi(element, url, datacenter)
 }
 
 
-function callUserApi(element, url, datacenter)
+function callUserApi(element, url, user, datacenter)
 {
+    url = url + '%22' + user + '%22' ;
     var apiXMLReq = new XMLHttpRequest();
-
-	document.getElementById(element).innerHTML = '<span class="fas fa-spinner"></span> Loading...';
     apiXMLReq.onreadystatechange = async function() {
         if (this.readyState == 4)
         {
-	    userresult= JSON.parse(this.responseText);
-	    if (userresult.result.length != 0)
+	    if (this.status == 200)
 	    {
-		username = userresult.result[0].userName;
-		var singleUser = { "username" : username , "profiles" : []};
-		profiles = userresult.result[0].userProfiles;
-		for (profile in profiles)
+		userresult= JSON.parse(this.responseText);
+		if (userresult.result.length != 0)
 		{
-		    callProfileApi (singleUser , 'openidm/' + profiles[profile]._ref, datacenter );
+		    username = userresult.result[0].userName;
+		    var singleUser = { "username" : username , "profiles" : []};
+		    profiles = userresult.result[0].userProfiles;
+		    for (profile in profiles)
+		    {
+			callProfileApi (singleUser , 'openidm/' + profiles[profile]._ref, datacenter );
+		    }
+		    await new Promise(resolve => setTimeout(resolve, waittime));
+		    singleUser.profiles=singleUser.profiles.sort((a, b) => a.profilename < b.profilename ? -1 : 1);
+		    for (i=0 ; i< singleUser.profiles.length; i++)
+		    {
+			curpr = singleUser.profiles[i];
+			ent = curpr.entitlements;
+			if (typeof ent === 'object')
+			{
+			    // Sort entitlements if they are not just a count
+			    ent.sort();
+			}
+		    }
+		    document.getElementById(element).innerHTML += renderJSON(singleUser);
 		}
-		await new Promise(resolve => setTimeout(resolve, waittime));
-		singleUser.profiles=singleUser.profiles.sort((a, b) => a.profilename < b.profilename ? -1 : 1);
-		document.getElementById(element).innerHTML = renderJSON(singleUser);
+		else
+		{
+		    document.getElementById(element).innerHTML += " <span class='alert-warning'>" + user + " - User not found </span> ";
+		}
 	    }
-	    else
+	    else if (this.status == 401)
 	    {
-		document.getElementById(element).innerHTML = "User Not Found";
+		showMsgNSecs ('alert-danger',JSON.parse(this.responseText).message + " - Please check your credentials",5);
+		document.getElementById(element).innerHTML = '' ;
 	    }
         }
       };
@@ -223,7 +257,7 @@ function changeEnvironment()
 
  function showMsgNSecs (alertclass, message, numsecs)
   {
-    document.getElementById('message').className = "alert "+alertclass;
+    document.getElementById('message').className = "mt-2 alert "+alertclass;
     document.getElementById('message').innerHTML = message;
     document.getElementById('message').style = 'visibility:visible';
 
@@ -231,4 +265,3 @@ function changeEnvironment()
       document.getElementById('message').style = 'visibility:hidden';
     }, numsecs*1000);
   }
-
