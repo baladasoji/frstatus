@@ -48,8 +48,8 @@ function searchUser()
   else
   {
     document.getElementById("tab-search").style.display='block';
-    uname=document.getElementById('uname').value.trim();
-    pwd=document.getElementById('pwd').value.trim();
+   // uname=document.getElementById('uname').value.trim();
+   // pwd=document.getElementById('pwd').value.trim();
     waittime = parseInt(document.getElementById('waittime').value.trim());
     showMsgNSecs ('alert-info' ,'<span class="fas fa-spinner"></span> Searching for users please wait...',waittime+2);
     waittime = waittime*1000;
