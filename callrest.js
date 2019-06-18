@@ -82,6 +82,7 @@ function callRest()
 	document.getElementById('btnSearchUser').addEventListener('click', searchUser);
 }
 
+/*
 function callProfileApi(element, url,datacenter)
 {
     var apiXMLReq = new XMLHttpRequest();
@@ -127,6 +128,8 @@ function callProfileApi(element, url,datacenter)
     apiXMLReq.send(null);
 
 }
+*/
+
 
 function callEntitlementApi(element, url, datacenter)
 {
@@ -168,24 +171,29 @@ function callUserApi(element, url, user, datacenter)
 		if (userresult.result.length != 0)
 		{
 		    username = userresult.result[0].userName;
-		    var singleUser = { "username" : username , "profiles" : []};
-		    profiles = userresult.result[0].userProfiles;
-		    for (profile in profiles)
-		    {
-			callProfileApi (singleUser , 'openidm/' + profiles[profile]._ref, datacenter );
-		    }
-		    await new Promise(resolve => setTimeout(resolve, waittime));
-		    singleUser.profiles=singleUser.profiles.sort((a, b) => a.profilename < b.profilename ? -1 : 1);
-		    for (i=0 ; i< singleUser.profiles.length; i++)
-		    {
-			curpr = singleUser.profiles[i];
-			ent = curpr.entitlements;
-			if (typeof ent === 'object')
+		    user = userresult.result[0];
+		    var singleUser = { "username" : username , "entitlements" : []};
+			if (countsOnly)
 			{
-			    // Sort entitlements if they are not just a count
-			    ent.sort();
+			    var singleUser = { "username" : username , "entitlements" :0 };
+			    entitlements = user.entitlements;
+			    singleUser.entitlements=entitlements.length;
+//			    element.users.push(singleUser);
 			}
-		    }
+			else
+			{
+			    singleUser = { "username": username, "entitlements":[]};
+			    entitlements = user.entitlements;
+			    for ( e in entitlements )
+			    {
+				callEntitlementApi (singleUser , 'openidm/' + entitlements[e]._ref, datacenter );
+			    }
+		    //	console.log(singleProfile.entitlements);
+//			    element.profiles.push(singleProfile);
+			}
+		    await new Promise(resolve => setTimeout(resolve, waittime));
+		singleUser.entitlements=singleUser.entitlements.sort((a, b) => a.entitlementKey < b.entitlementKey ? -1 : 1);
+
 		    document.getElementById(element).innerHTML += renderJSON(singleUser);
 		}
 		else
