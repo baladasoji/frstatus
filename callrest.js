@@ -17,7 +17,7 @@ var AMER_DC="";
 var APAC_DC="";
 var countsOnly=true;
 var latestentitlements;
-
+var access_token='';
 var api_url = api_url_cdt ;
 //var api_url = "https://iam.maerskline.com/";
 var unamehdr = "X-OpenIDM-Username";
@@ -77,6 +77,7 @@ function searchUser()
 
 function callRest()
 {
+	access_token=sessionStorage.access_token;
 	document.getElementById('environmentChoice').addEventListener('click', changeEnvironment);
 	document.getElementById('btnSearchUser').addEventListener('click', searchUser);
 }
@@ -119,8 +120,9 @@ function callProfileApi(element, url,datacenter)
         }
       };
     apiXMLReq.open("GET", api_url + url , true );
-    apiXMLReq.setRequestHeader(unamehdr, uname );
-    apiXMLReq.setRequestHeader(pwdhdr, pwd );
+	apiXMLReq.setRequestHeader("Authorization","Bearer "+access_token);
+  //  apiXMLReq.setRequestHeader(unamehdr, uname );
+  //  apiXMLReq.setRequestHeader(pwdhdr, pwd );
     apiXMLReq.setRequestHeader(datacenterhdr, datacenter );
     apiXMLReq.send(null);
 
@@ -145,8 +147,9 @@ function callEntitlementApi(element, url, datacenter)
         }
       };
     apiXMLReq.open("GET", api_url + url , true );
-    apiXMLReq.setRequestHeader(unamehdr, uname );
-    apiXMLReq.setRequestHeader(pwdhdr, pwd );
+	apiXMLReq.setRequestHeader("Authorization","Bearer "+access_token);
+  //  apiXMLReq.setRequestHeader(unamehdr, uname );
+  //  apiXMLReq.setRequestHeader(pwdhdr, pwd );
     apiXMLReq.setRequestHeader(datacenterhdr, datacenter );
     apiXMLReq.send(null);
 }
@@ -198,8 +201,9 @@ function callUserApi(element, url, user, datacenter)
         }
       };
     apiXMLReq.open("GET", api_url + url , true );
-    apiXMLReq.setRequestHeader(unamehdr, uname );
-    apiXMLReq.setRequestHeader(pwdhdr, pwd );
+	apiXMLReq.setRequestHeader("Authorization","Bearer "+access_token);
+//    apiXMLReq.setRequestHeader(unamehdr, uname );
+//    apiXMLReq.setRequestHeader(pwdhdr, pwd );
     apiXMLReq.setRequestHeader(datacenterhdr, datacenter );
     apiXMLReq.send(null);
 }

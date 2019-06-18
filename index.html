@@ -1,94 +1,29 @@
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <title>Forgerock IDM administration</title>
+  <!-- Bootstrap core CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <link href="jumbotron.css" rel="stylesheet">
 
-    <title>IDM User Search</title>
+  <!-- Custom styles for this template -->
 
-    <!-- Bootstrap core CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-    
-<!-- Custom styles for this template -->
-    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    <link href="tree.css" rel="stylesheet">
-    <link href="css/all.css" rel="stylesheet">
-    <link href="jumbotron.css" rel="stylesheet">
-    <script type="text/javascript" src="callrest.js"></script>
-    <script defer src="js/all.js"></script> <!--load all styles -->
-  </head>
+  <script type="text/javascript" src="index.js"></script>
 
-  <body onload=callRest()>
+</head>
+<body onload="store()">
 
-    <div class="jumbotron">
-      <div class="container">
-        <h1 class="display-4">IDM User Search</h1>
-
-	    
-	    <div class="row mb-2">
-	      <div class="col-12">
-		<p>
-		  <select id="environmentChoice" class="btn btn-block btn-info btn-lg">
-		    <option value="NONE">Please choose an environment.. </option>
-		    <option value="CDT">CDT</option>
-		    <option value="STAGE">Staging</option>
-		    <option value="PRODUCTION">Production</option>
-		  </select>
-		</p>
-	      </div>
-	    </div>
-
-<!-- NOT YET READY for this -->
-	  <div class="form-group">
-	    <label for="username">Admin Username</label>
-	    <input type="username" class="form-control" id="uname" placeholder="Enter username">
-	  </div>
-	  <div class="form-group">
-	    <label for="password">Admin Password</label>
-	    <input type="password" class="form-control" id="pwd" placeholder="Enter Password">
-	  </div>
-	  <div class="form-group">
-	    <label for="waittime">Timeout (seconds)</label>
-	    <input type="text" class="form-control" id="waittime" placeholder="Wait time" value="10">
-	  </div>
-	  <div class="form-group">
-	    <label for="usernames">User to Search</label>
-	    <textarea class="form-control" rows="5" id="usernames" placeholder="Paste usernames here - One per line"></textarea>
-	  </div>
-	    <div class="form-check">
-		<input type="checkbox" class="form-check-input" id="checkCountOnly" checked>
-		<label class="form-check-label" for="checkCountOnly">Entitlement Count Only (Fast response)</label>
-	    </div>
-	    <div class="form-check">
-		<input type="checkbox" class="form-check-input" id="checkSingleDC" checked>
-		<label class="form-check-label" for="checkSingleDC">Single DC Only (EMEA)</label>
-	    </div>
-	<a href='#tab-search' id="btnSearchUser" class="btn btn-info" role="button">Search for User</a>
-	<div id="message" class="alert alert-primary" style="visibility:hidden"> </div>
-    <BR>
-
-    </div>
-    </div>
-
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="navbar-nav">
+          <a class="nav-item nav-link h3 active" href="search.html">Home</a>
+        </div>
+    </nav>
+  <div class="jumbotron">
     <div class="container">
-	<div id="tab-search" style="display:none">
-	  <table class="table table-striped table-bordered">
-	    <thead>
-	      <tr>
-		<th>EMEA</th>
-		<th>APAC</th>
-		<th>AMER</th>
-	      </tr>
-	    </thead>
-	    <tbody>
-	      <tr>
-		<td id='emeauserresult'></td>
-		<td id='apacuserresult'></td>
-		<td id='ameruserresult'></td>
-	      </tr>
-	    </tbody>
-	  </table>
-	</div>
-  </body>
-</html>
+      <h1 class="display-4">Portal User management</h1>
+      <p class="text text-danger" id="message"> </p>
+    </div>
+  </div>
+</body>
