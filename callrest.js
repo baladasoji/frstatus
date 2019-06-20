@@ -192,7 +192,7 @@ function callUserApi(element, url, user, datacenter)
 //			    element.profiles.push(singleProfile);
 			}
 		    await new Promise(resolve => setTimeout(resolve, waittime));
-		singleUser.entitlements=singleUser.entitlements.sort((a, b) => a.entitlementKey < b.entitlementKey ? -1 : 1);
+		//singleUser.entitlements=singleUser.entitlements.sort((a, b) => a.entitlementKey < b.entitlementKey ? -1 : 1);
 
 		    document.getElementById(element).innerHTML += renderJSON(singleUser);
 		}
